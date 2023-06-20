@@ -43,17 +43,17 @@ public:
         cout << "Price : " << Price << " USD = " << Price*a.EUR
              << " EUR = " << Price*a.IRR << " IRR" << endl << endl ;
     }
-    bool operator < (product b) {
-        if ( this->Name < b.Name )
-            return true ;
-        if ( this->Name > b.Name )
-            return false ;
-        if ( this->ID < b.ID )
-            return true ;
-        return false;
-    }
-
 };
+//------------------------------------------------------------------------
+bool operator < (product a , product b) {
+    if ( a.Name < b.Name )
+        return true ;
+    if ( a.Name > b.Name )
+        return false ;
+    if ( a.ID < b.ID )
+        return true ;
+    return false;
+}
 //------------------------------------------------------------------------
 class pset : public set<product> {
 public:
