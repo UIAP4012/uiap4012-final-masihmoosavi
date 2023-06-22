@@ -2,11 +2,11 @@
 #include <windows.h>
 #include <set>
 
-#define green HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE) ;SetConsoleTextAttribute(hConsole,10)
-#define red HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE) ;SetConsoleTextAttribute(hConsole,12)
-#define blue HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE) ;SetConsoleTextAttribute(hConsole,11)
-#define white HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE) ;SetConsoleTextAttribute(hConsole,7)
-#define yelow HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE) ;SetConsoleTextAttribute(hConsole,6)
+#define green if (1){HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE) ;SetConsoleTextAttribute(hConsole,10);}
+#define red if (1){HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE) ;SetConsoleTextAttribute(hConsole,12);}
+#define blue if (1){HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE) ;SetConsoleTextAttribute(hConsole,11);}
+#define white if (1){HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE) ;SetConsoleTextAttribute(hConsole,7);}
+#define yelow if (1){HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE) ;SetConsoleTextAttribute(hConsole,6);}
 
 using namespace std;
 
@@ -16,7 +16,7 @@ public:
     double IRR = 1 ; // value of USD/IRR
     double EUR = 1 ; // value of USD/EUR
     void update_price () {
-        yelow;
+        yelow
         cout << "Enter the equivalent value" << endl ;
         cout << "1 USD = ? IRR" << endl ;
         double r ; // 1 USD = r IRR
@@ -45,6 +45,7 @@ public:
     }
 };
 //------------------------------------------------------------------------
+// operator < overloaded for uset
 bool operator < (product a , product b) {
     if ( a.Name < b.Name )
         return true ;
