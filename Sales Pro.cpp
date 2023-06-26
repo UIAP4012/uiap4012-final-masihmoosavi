@@ -292,6 +292,239 @@ public:
 };
 //------------------------------------------------------------------------
 
+class user {
+public:
+    double DWallet ; // amount of USD
+    double EWallet ; // amount of EUR
+    double RWallet ; // amount of IRR
+    string Username ;
+    string Password ;
+    pset Cart ;
+    ivec Orders ; // successful orders and invoices
+    user (string u , string p ) {
+        DWallet = 0 ;
+        EWallet = 0 ;
+        RWallet = 0 ;
+        Username = u ;
+        Password = p ;
+        Cart.clear() ;
+        Orders.clear() ;
+    }
+    // add product by search ID (for users)
+    void add_product_id (pset &p) {
+        yelow ;
+        cout << "Enter the product ID : " ;
+        long long id ;
+        cin >> id ;
+        cor ;
+        if ( this->Cart.search_id(id) ) {
+            red ;
+            cout << "ID is duplicate !" << endl ;
+        }
+        else {
+            for ( const auto &i : p )
+                if ( i.ID == id ){
+                    cout << "Enter number of the product : " ;
+                    int num ;
+                    cin >> num ;
+                    cor;
+                    product a ;
+                    a.ID = id ;
+                    a.Name = i.Name ;
+                    a.Number = num ;
+                    a.Price = i.Price ;
+                    this->Cart.insert(a) ;
+                    green ;
+                    cout << "Added !" << endl ;
+                    return;
+                }
+            red ;
+            cout << "ID not found !" << endl ;
+        }
+    }
+    void payment (MoneyValue a , pset &p , user & admin ) {
+        if (this->Cart.empty()) {
+            red ;
+            cout << "Cart is empty !" << endl ;
+        }
+        else {
+            bool r ; // be remove ?
+            bool b = 1 ; // be buy ?
+            for ( const auto &i : this->Cart ) {
+                r = 1 ;
+                for ( const auto &j : p ) {
+                    if (i.ID == j.ID ){
+                        r = 0 ;
+                        if (i.Number > j.Number ) {
+                            red ;
+                            cout << "This quantity of product with ID " << i.ID << " is not available !" << endl ;
+                            b = 0 ;
+                        }
+                    }
+                }
+                if (r == 1) {
+                    red ;
+                    cout << "The product with ID " << i.ID << " is no longer available !" << endl ;
+                    cout << "The product with ID " << i.ID << " removed from your Cart !" << endl ;
+                    this->Cart.erase(i) ;
+                }
+            }
+            if (b == 1 ) {
+                yelow ;
+                cout << "1 - Payment by USD Wallet" << endl ;
+                cout << "2 - Payment by EUR Wallet" << endl ;
+                cout << "3 - Payment by IRR Wallet" << endl ;
+                cout << endl ;
+                cout << "Enter command number : " ;
+                int c ; // command number
+                cin >> c ;
+                isint ;
+                cout << endl ;
+                switch (c) {
+                case 1 : {
+                    if (this->Cart.sum_of_prices() <= this->DWallet ) {
+                        this->DWallet -= this->Cart.sum_of_prices() ;
+                        for ( const auto &i : this->Cart ) {
+                            for ( auto j : p ) {
+                                if (i.ID == j.ID ){
+                                    j.Number -= i.Number ;
+
+                                }
+                            }
+                        }
+                        invoice x (this->Cart , this->Username , this->Cart.sum_of_prices() , 0 , 0 ) ;
+                        this->Orders.push_back(x) ;
+                        admin.Orders.push_back(x) ;
+                        this->Cart.clear() ;
+                        green ;
+                        cout << "Payment is seccessful !" << endl ;
+                    }
+                    else {
+                        red ;
+                        cout << "Insufficient inventory !" << endl ; // not enough
+                    }
+                    break ;
+                }
+                case 2 : {
+                    if (a.tabdil_DE(this->Cart.sum_of_prices()) <= this->EWallet ) {
+                        this->EWallet -= a.tabdil_DE(this->Cart.sum_of_prices()) ;
+                        for ( const auto &i : this->Cart ) {
+                            for ( auto j : p ) {
+                                if (i.ID == j.ID ){
+                                    j.Number -= i.Number ;
+                                }
+                            }
+                        }
+                        invoice x (this->Cart , this->Username , 0 , a.tabdil_DE(this->Cart.sum_of_prices()) , 0 ) ;
+                        this->Orders.push_back(x) ;
+                        admin.Orders.push_back(x) ;
+                        this->Cart.clear() ;
+                        green ;
+                        cout << "Payment is seccessful !" << endl ;
+                    }
+                    else {
+                        red ;
+                        cout << "Insufficient inventory !" << endl ;
+                    }
+                    break ;
+                }
+                case 3 : {
+                    if (a.tabdil_DR(this->Cart.sum_of_prices()) <= this->RWallet ) {
+                        this->RWallet -= a.tabdil_DR(this->Cart.sum_of_prices()) ;
+                        for ( const auto &i : this->Cart ) {
+                            for ( auto j : p ) {
+                                if (i.ID == j.ID ){
+                                    j.Number -= i.Number ;
+                                }
+                            }
+                        }
+                        invoice x (this->Cart , this->Username , 0 , 0 , a.tabdil_DR(this->Cart.sum_of_prices()) ) ;
+                        this->Orders.push_back(x) ;
+                        admin.Orders.push_back(x) ;
+                        this->Cart.clear() ;
+                        green ;
+                        cout << "Payment is seccessful !" << endl ;
+                    }
+                    else {
+                        red ;
+                        cout << "Insufficient inventory !" << endl ;
+                    }
+                    break ;
+                }
+                default: {
+                    red ;
+                    cout << "Command not found !" << endl ;
+                }
+                }
+            }
+        }
+    }
+    void edit_cart () {
+        yelow ;
+        cout << "Enter the product ID : " ;
+        long long id ;
+        cin >> id ;
+        cor;
+        for ( auto i : (this->Cart) ){
+            if ( i.ID == id ){
+                cout << "Enter new number of this product : " ;
+                int num ;
+                cin >> num ;
+                cor;
+                i.Number = num ;
+                green ;
+                cout << "Edited !" << endl ;
+                return;
+            }
+        }
+        red ;
+        cout << "ID not found !" << endl ;
+    }
+    void increase_credit () {
+        yelow ;
+        cout << "Commands :" << endl << endl ;
+        cout << "1 - Increase USD credit" << endl ;
+        cout << "2 - Increase EUR credit" << endl ;
+        cout << "3 - Increase IRR credit" << endl ;
+        cout << endl ;
+        cout << "Enter command number : " ;
+        int c ; // command number
+        cin >> c ;
+        isint ;
+        switch (c) {
+        case 1 : {
+            cout << "Enter the desired amount (USD) : " ;
+            double m ;
+            cin >> m ;
+            cor;
+            this->DWallet += m ;
+            break ;
+        }
+        case 2 : {
+            cout << "Enter the desired amount (EUR) : " ;
+            double m ;
+            cin >> m ;
+            cor;
+            this->EWallet += m ;
+            break ;
+        }
+        case 3 : {
+            cout << "Enter the desired amount (IRR) : " ;
+            double m ;
+            cin >> m ;
+            cor;
+            this->RWallet += m ;
+            break ;
+        }
+        default: {
+            red ;
+            cout << "Command not found !" << endl ;
+        }
+        }
+    }
+
+};
+
 
 //------------------------------------------------------------------------
 //||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
