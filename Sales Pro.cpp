@@ -67,7 +67,6 @@ public:
         return e ;
     }
 };
-
 //-----------------------------------------------------------------------
 class product {
 public:
@@ -224,9 +223,81 @@ public:
     }
 };
 //------------------------------------------------------------------------
-//||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+class invoice {
+public:
+    time_t now ;
+    tm * local_time ;
+    string Username_of_buyer ;
+    pset O ; // orders
+    double DPayment_amount ; // USD payment amount
+    double EPayment_amount ; // EUR payment amount
+    double RPayment_amount ; // IRR payment amount
+    invoice (pset &cart , string username , double Dpay_amount , double Epay_amount , double Rpay_amount ) {
+        now = time(0) ;
+        local_time = localtime(&now) ;
+        Username_of_buyer = username ;
+        for (const auto &i : cart)
+            O.insert(i) ;
+        DPayment_amount = Dpay_amount ;
+        EPayment_amount = Epay_amount ;
+        RPayment_amount = Rpay_amount ;
+    }
+};
+//------------------------------------------------------------------------
+class ivec : public vector<invoice> {
+public:
+    // print all orders and invoices
+    void i_print () {
+        if (this->empty()) {
+            red ;
+            cout << "Empty !" << endl ;
+        }
+        else {
+            white ;
+            cout << "Seller : Sales Pro" << endl ;
+            for ( const auto &i : (*this) ) {
+                cout << "--------------------------------------------------------------------------" << endl ;
+                cout << "Buyer : " << i.Username_of_buyer << endl ;
+                cout << "Date : " << i.local_time->tm_mday << "/"
+                     << i.local_time->tm_mon+1 << "/" << i.local_time->tm_year+1900 << endl ;
+                cout << "Time : " << i.local_time->tm_hour << ":" << i.local_time->tm_min << endl ;
+                for ( const auto &j : i.O ) {
+                    cout << "ID : " << j.ID << "\t"
+                         << "Name : " << j.Name << "\t"
+                         << "Price : " << j.Price << "\t"
+                         << "Number : " << j.Number << endl ;
+                }
+                cout << "USD amount paid : " << i.DPayment_amount << endl ;
+                cout << "EUR amount paid : " << i.EPayment_amount << endl ;
+                cout << "IRR amount paid : " << i.RPayment_amount << endl ;
+                cout << endl ;
+            }
+        }
+    }
+    void total_incom () {
+        double Dincome = 0 ;
+        double Eincome = 0 ;
+        double Rincome = 0 ;
+        for ( const auto &i : (*this) ) {
+            Dincome += i.DPayment_amount ;
+            Eincome += i.EPayment_amount ;
+            Rincome += i.RPayment_amount ;
+        }
+        green ;
+        cout << endl ;
+        cout << "Total USD income : " << Dincome << endl ;
+        cout << "Total EUR income : " << Eincome << endl ;
+        cout << "Total IRR income : " << Rincome << endl ;
+    }
+};
 //------------------------------------------------------------------------
 
+
+//------------------------------------------------------------------------
+//||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+//------------------------------------------------------------------------
+//||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+//------------------------------------------------------------------------
 
 int main()
 {
