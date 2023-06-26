@@ -524,6 +524,129 @@ public:
     }
 
 };
+//------------------------------------------------------------------------
+class uvec : public vector<user> {
+public:
+    // search by username and password
+    bool search ( string u , string p ) {
+        for ( const auto &i : (*this) )
+            if ( i.Username == u )
+                if (i.Password == p )
+                    return true ;
+        return false ;
+    }
+    // search by username
+    bool search_username ( string u ) {
+        for ( const auto &i : (*this) )
+            if ( i.Username == u )
+                return true ;
+        return false ;
+    }
+    void sign_up () {
+        yelow;
+        cout << "Enter username : " ;
+        string u ;
+        cin >> u ;
+        cout << endl ;
+        cout << "Enter password : " ;
+        string p ;
+        cin >> p ;
+        cout << endl ;
+        if ( this->search_username(u) ) {
+            red;
+            cout << "Duplicate username !" << endl ;
+        }
+        else {
+            user a(u,p) ;
+            this->push_back(a) ;
+            green;
+            cout << "Sign up is successful !" << endl ;
+        }
+    }
+    user * log_in () {
+        yelow ;
+        cout << "Enter username : " ;
+        string u ;
+        cin >> u ;
+        cout << endl ;
+        cout << "Enter password : " ;
+        string p ;
+        cin >> p ;
+        cout << endl ;
+        for (unsigned int i = 0 ; i < this->size() ; i ++ ) {
+            if ( (*this)[i].Username == u )
+                if ( (*this)[i].Password == p ){
+                    green ;
+                    cout << "Log in was successfu !" << endl ;
+                    return &((*this)[i]);
+                }
+        }
+        red ;
+        cout << "Log in failed !" << endl ;
+        return nullptr ;
+    }
+    void delete_account () {
+        yelow ;
+        cout << "Enter username : " ;
+        string u ;
+        cin >> u ;
+        cout << endl ;
+        cout << "Enter password : " ;
+        string p ;
+        cin >> p ;
+        cout << endl ;
+        for (uvec::iterator i = this->begin() ; i != this->end() ; i++ ) {
+            if ( i->Username == u )
+                if ( i->Password == p ){
+                    this->erase(i) ;
+                    green ;
+                    cout << "Deleted !" << endl ;
+                    return;
+                }
+        }
+        red ;
+        cout << "Account not found !" ;
+    }
+    void change_password (user * t) {
+        yelow ;
+        cout << "Enter password : " ;
+        string p ;
+        cin >> p ;
+        if ( t->Password == p ) {
+            cout << "Enter new password : " ;
+            string np ;
+            cin >> np ;
+            t->Password = np ;
+            green ;
+            cout << "Changed !" << endl ;
+            return;
+        }
+        red ;
+        cout << "Password is not correct !" << endl ;
+    }
+    // print all profile users
+    void u_print () {
+        if (this->empty()) {
+            red ;
+            cout << "Empty !" << endl ;
+        }
+        else {
+            int j = 1 ;
+            for ( const auto &i : (*this) ) {
+                if ( i.Username != "admin" ) {
+                    cout << j << ")" << endl ;
+                    cout << "Username : " << i.Username << endl ;
+                    cout << "Password : " << i.Password << endl ;
+                    cout << "USD Wallet : " << i.DWallet << endl ;
+                    cout << "EUR Wallet : " << i.EWallet << endl ;
+                    cout << "IRR Wallet : " << i.RWallet << endl ;
+                    j ++ ;
+                }
+            }
+        }
+    }
+
+};
 
 
 //------------------------------------------------------------------------
