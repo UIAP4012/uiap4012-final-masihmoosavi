@@ -37,7 +37,7 @@
 
 using namespace std;
 
-//----------------------------------------------------------------------
+//------------------------------------------------------------------------
 class MoneyValue {
 public:
     double IRR = 1 ; // value of USD/IRR
@@ -93,7 +93,7 @@ public:
 
 
 };
-//-----------------------------------------------------------------------
+//------------------------------------------------------------------------
 class product {
 public:
     long long ID ;
@@ -101,9 +101,10 @@ public:
     int Number ;
     double Price ; // USD price
     void print ( MoneyValue a ) {
+        white ;
         cout << "ID : " << ID << endl ;
         cout << "Name : " << Name << endl ;
-        cout << "Number of available : " << Number << endl ;
+        cout << "Number : " << Number << endl ;
         cout << "Price : " << Price << " USD = " << Price*a.EUR
              << " EUR = " << Price*a.IRR << " IRR" << endl << endl ;
     }
@@ -124,6 +125,7 @@ class pset : public set<product> {
 public:
     // print all products
     void print ( MoneyValue a ) {
+        white ;
         if (this->empty()) {
             red ;
             cout << "Empty !" << endl ;
@@ -158,7 +160,7 @@ public:
         cout << endl ;
         if ( this->search_id(id) ) {
             red ;
-            cout << "Product is duplicate !" << endl ;
+            cout << "Product ID is duplicate !" << endl ;
         }
         else {
             this->insert ({id,name,num,price}) ;
@@ -175,7 +177,7 @@ public:
         for ( const auto &i : (*this) )
             if ( i.ID == id ) {
                 cout << "Name : " << i.Name << endl ;
-                cout << "Number of available : " << i.Number << endl ;
+                cout << "Number : " << i.Number << endl ;
                 cout << "Price (USD) : " << i.Price << endl ;
                 this->erase({i.ID,i.Name,i.Number,i.Price}) ;
                 green ;
@@ -231,14 +233,17 @@ public:
         cout << "Enter name : " ;
         string name ;
         cin >> name ;
+        bool is_find = 0 ;
         for ( auto i : (*this) )
             if ( i.Name == name ) {
                 white ;
                 i.print(a) ;
-                return ;
+                is_find = 1 ;
             }
-        red ;
-        cout << "Not found !" << endl ;
+        if (is_find == 0) {
+            red ;
+            cout << "Not found !" << endl ;
+        }
     }
     // sum of USD prices of produts that is in Cart
     double sum_of_prices () {
@@ -280,6 +285,7 @@ public:
             p.close() ;
         }
     }
+
 };
 //------------------------------------------------------------------------
 class invoice {
@@ -340,15 +346,16 @@ public:
             white ;
             cout << "Seller : Sales Pro" << endl ;
             for ( const auto &i : (*this) ) {
+
                 cout << "--------------------------------------------------------------------------" << endl ;
                 cout << "Buyer : " << i.Username_of_buyer << endl ;
-                cout << "Date : " << i.local_time->tm_mday << "/"
-                     << i.local_time->tm_mon+1 << "/" << i.local_time->tm_year+1900 << endl ;
-                cout << "Time : " << i.local_time->tm_hour << ":" << i.local_time->tm_min << endl ;
+                cout << "Date : " << localtime(&(i.now))->tm_mday << "/"
+                     << localtime(&(i.now))->tm_mon+1 << "/" << localtime(&(i.now))->tm_year+1900 << endl ;
+                cout << "Time : " << localtime(&(i.now))->tm_hour << ":" << localtime(&(i.now))->tm_min << endl ;
                 for ( const auto &j : i.O ) {
-                    cout << "ID : " << j.ID << "\t"
-                         << "Name : " << j.Name << "\t"
-                         << "Price : " << j.Price << "\t"
+                    cout << "ID : " << j.ID << "        "
+                         << "Name : " << j.Name << "        "
+                         << "Price (USD) : " << j.Price << "          "
                          << "Number : " << j.Number << endl ;
                 }
                 cout << "USD amount paid : " << i.DPayment_amount << endl ;
@@ -373,9 +380,10 @@ public:
         cout << "Total EUR income : " << Eincome << endl ;
         cout << "Total IRR income : " << Rincome << endl ;
     }
+
+
 };
 //------------------------------------------------------------------------
-
 class user {
 public:
     double DWallet ; // amount of USD
@@ -394,7 +402,6 @@ public:
         Cart.clear() ;
         Orders.clear() ;
     }
-
     user () {
         DWallet = 0 ;
         EWallet = 0 ;
@@ -402,7 +409,6 @@ public:
         Cart.clear() ;
         Orders.clear() ;
     }
-
     // add product by search ID (for users)
     void add_product_id (pset &p) {
         yelow ;
@@ -421,6 +427,11 @@ public:
                     int num ;
                     cin >> num ;
                     cor;
+                    if (num == 0) {
+                        red ;
+                        cout << "Error !" << endl ;
+                        return;
+                    }
                     product a ;
                     a.ID = id ;
                     a.Name = i.Name ;
@@ -441,10 +452,18 @@ public:
             cout << "Cart is empty !" << endl ;
         }
         else {
-            bool r ; // be remove ?
+            bool r = 0 ; // be remove ?
             bool b = 1 ; // be buy ?
+            product l ;
             for ( const auto &i : this->Cart ) {
+                if (r == 1) {
+                    red ;
+                    cout << "The product with ID " << l.ID << " is no longer available !" << endl ;
+                    cout << "The product with ID " << l.ID << " removed from your Cart !" << endl ;
+                    this->Cart.erase(l) ;
+                }
                 r = 1 ;
+                l = i ;
                 for ( const auto &j : p ) {
                     if (i.ID == j.ID ){
                         r = 0 ;
@@ -455,12 +474,13 @@ public:
                         }
                     }
                 }
-                if (r == 1) {
-                    red ;
-                    cout << "The product with ID " << i.ID << " is no longer available !" << endl ;
-                    cout << "The product with ID " << i.ID << " removed from your Cart !" << endl ;
-                    this->Cart.erase(i) ;
-                }
+
+            }
+            if (r == 1) {
+                red ;
+                cout << "The product with ID " << l.ID << " is no longer available !" << endl ;
+                cout << "The product with ID " << l.ID << " removed from your Cart !" << endl ;
+                this->Cart.erase(l) ;
             }
             if (b == 1 ) {
                 yelow ;
@@ -475,19 +495,33 @@ public:
                 cout << endl ;
                 switch (c) {
                 case 1 : {
+                    product y ;
+                    product z ;
+                    y.ID = 0 ;
+                    z.ID = 0 ;
                     if (this->Cart.sum_of_prices() <= this->DWallet ) {
                         this->DWallet -= this->Cart.sum_of_prices() ;
                         for ( const auto &i : this->Cart ) {
-                            for ( auto j : p ) {
+                            if (z.ID != 0 && y.ID != 0 ) {
+                                p.erase(y) ;
+                                p.insert(z) ;
+                            }
+                            for ( const auto &j : p ) {
                                 if (i.ID == j.ID ){
-                                    j.Number -= i.Number ;
-
+                                    y = j ;
+                                    z.ID = j.ID ;
+                                    z.Name = j.Name ;
+                                    z.Number = (j.Number) - (i.Number) ;
+                                    z.Price = j.Price ;
                                 }
                             }
                         }
+                        p.erase(y) ;
+                        p.insert(z) ;
                         invoice x (this->Cart , this->Username , this->Cart.sum_of_prices() , 0 , 0 ) ;
                         this->Orders.push_back(x) ;
                         admin.Orders.push_back(x) ;
+                        x.print_csv() ;
                         this->Cart.clear() ;
                         green ;
                         cout << "Payment is seccessful !" << endl ;
@@ -499,18 +533,33 @@ public:
                     break ;
                 }
                 case 2 : {
+                    product y ;
+                    product z ;
+                    y.ID = 0 ;
+                    z.ID = 0 ;
                     if (a.tabdil_DE(this->Cart.sum_of_prices()) <= this->EWallet ) {
                         this->EWallet -= a.tabdil_DE(this->Cart.sum_of_prices()) ;
                         for ( const auto &i : this->Cart ) {
-                            for ( auto j : p ) {
-                                if (i.ID == j.ID ){
-                                    j.Number -= i.Number ;
+                            if (z.ID != 0 && y.ID != 0 ) {
+                                p.erase(y) ;
+                                p.insert(z) ;
+                            }
+                            for ( pset::iterator j = p.begin() ; j != p.end() ; j++ ) {
+                                if (i.ID == j->ID ){
+                                    y = (*j) ;
+                                    z.ID = j->ID ;
+                                    z.Name = j->Name ;
+                                    z.Number = (j->Number) - (i.Number) ;
+                                    z.Price = j->Price ;
                                 }
                             }
                         }
+                        p.erase(y) ;
+                        p.insert(z) ;
                         invoice x (this->Cart , this->Username , 0 , a.tabdil_DE(this->Cart.sum_of_prices()) , 0 ) ;
                         this->Orders.push_back(x) ;
                         admin.Orders.push_back(x) ;
+                        x.print_csv() ;
                         this->Cart.clear() ;
                         green ;
                         cout << "Payment is seccessful !" << endl ;
@@ -522,18 +571,33 @@ public:
                     break ;
                 }
                 case 3 : {
+                    product y ;
+                    product z ;
+                    y.ID = 0 ;
+                    z.ID = 0 ;
                     if (a.tabdil_DR(this->Cart.sum_of_prices()) <= this->RWallet ) {
                         this->RWallet -= a.tabdil_DR(this->Cart.sum_of_prices()) ;
                         for ( const auto &i : this->Cart ) {
-                            for ( auto j : p ) {
-                                if (i.ID == j.ID ){
-                                    j.Number -= i.Number ;
+                            if (z.ID != 0 && y.ID != 0 ) {
+                                p.erase(y) ;
+                                p.insert(z) ;
+                            }
+                            for ( pset::iterator j = p.begin() ; j != p.end() ; j++ ) {
+                                if (i.ID == j->ID ){
+                                    y = (*j) ;
+                                    z.ID = j->ID ;
+                                    z.Name = j->Name ;
+                                    z.Number = (j->Number) - (i.Number) ;
+                                    z.Price = j->Price ;
                                 }
                             }
                         }
+                        p.erase(y) ;
+                        p.insert(z) ;
                         invoice x (this->Cart , this->Username , 0 , 0 , a.tabdil_DR(this->Cart.sum_of_prices()) ) ;
                         this->Orders.push_back(x) ;
                         admin.Orders.push_back(x) ;
+                        x.print_csv() ;
                         this->Cart.clear() ;
                         green ;
                         cout << "Payment is seccessful !" << endl ;
@@ -558,17 +622,34 @@ public:
         long long id ;
         cin >> id ;
         cor;
-        for ( auto i : (this->Cart) ){
+        bool e = 0 ; // be edited ?
+        product z ;
+        product y ;
+        for ( const auto &i : (this->Cart) ){
             if ( i.ID == id ){
                 cout << "Enter new number of this product : " ;
                 int num ;
                 cin >> num ;
                 cor;
-                i.Number = num ;
-                green ;
-                cout << "Edited !" << endl ;
-                return;
+                e = 1 ;
+                if (num == 0) {
+                    red ;
+                    cout << "Error !" << endl ;
+                    return;
+                }
+                y = i ;
+                z.ID = i.ID ;
+                z.Name = i.Name ;
+                z.Number = num ;
+                z.Price = i.Price ;
             }
+        }
+        if (e == 1) {
+            this->Cart.erase(y) ;
+            this->Cart.insert(z) ;
+            green ;
+            cout << "Edited !" << endl ;
+            return;
         }
         red ;
         cout << "ID not found !" << endl ;
@@ -637,13 +718,20 @@ public:
     }
     void sign_up () {
         yelow;
+        cout << "Enter 0 to Return ." << endl ;
         cout << "Enter username : " ;
         string u ;
         cin >> u ;
+        if ( u == "0" ) {
+            return;
+        }
         cout << endl ;
         cout << "Enter password : " ;
         string p ;
         cin >> p ;
+        if ( p == "0" ) {
+            return;
+        }
         cout << endl ;
         if ( this->search_username(u) ) {
             red;
@@ -658,13 +746,20 @@ public:
     }
     user * log_in () {
         yelow ;
+        cout << "Enter 0 to Return ." << endl ;
         cout << "Enter username : " ;
         string u ;
         cin >> u ;
+        if ( u == "0" ) {
+            return nullptr;
+        }
         cout << endl ;
         cout << "Enter password : " ;
         string p ;
         cin >> p ;
+        if ( p == "0" ) {
+            return nullptr;
+        }
         cout << endl ;
         for (unsigned int i = 0 ; i < this->size() ; i ++ ) {
             if ( (*this)[i].Username == u )
@@ -719,7 +814,8 @@ public:
     }
     // print all profile users
     void u_print () {
-        if (this->empty()) {
+        white ;
+        if (this->size() <= 1 ) {
             red ;
             cout << "Empty !" << endl ;
         }
@@ -833,15 +929,14 @@ public:
         }
     }
 
+
 };
 
-
 //------------------------------------------------------------------------
 //||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 //------------------------------------------------------------------------
 //||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 //------------------------------------------------------------------------
-
 int main()
 {
     MoneyValue money ;
