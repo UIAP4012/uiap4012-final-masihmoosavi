@@ -844,5 +844,247 @@ public:
 
 int main()
 {
+    MoneyValue money ;
+    pset p ; // set <product>
+    p.pset_read() ;
+    uvec u ; // vector <user>
+    u.uvec_read() ;
+    user * q ;
+    for ( uvec::iterator i = u.begin() ; i != u.end() ; i++ ) {
+        if ( i->Username == "admin" )
+            q = &(*i) ;
+    }
+    bool end = 0 ;
+    int com ; // command number
+    cout << "SALES PRO" << endl ;
+    while (true) {
+        blue ;
+        cout << endl << endl << endl << endl << endl << endl << endl ;
+        cout << "Commands :" << endl << endl ;
+        cout << "1 - Sign up" << endl ;
+        cout << "2 - Log in" << endl ;
+        cout << "0 - Exit" << endl ;
+        cout << endl ;
+        cout << "Enter command number : " ;
+        cin >> com ;
+        isintc ;
+        cout << endl ;
+        switch (com) {
+        case 0 : {
+            end = 1 ;
+            break;
+        }
+        case 1 : {
+            system ("cls") ;
+            u.sign_up() ;
+            break;
+        }
+        case 2 : {
+            system ("cls") ;
+            user * t = u.log_in()  ;
+            if ( t != nullptr) {
+                // users --------------------------------------------------
+                if ( t->Username != "admin" ) {
+                    while (true) {
+                        blue ;
+                        int c ; // command number
+                        cout << endl << endl << endl ;
+                        cout << "Commands :" << endl << endl ;
+                        cout << "1 - Profile" << endl ;
+                        cout << "2 - Change Password" << endl ;
+                        cout << "3 - Delete Account" << endl ;
+                        cout << "4 - Show All Products" << endl ;
+                        cout << "5 - Search Product" << endl ;
+                        cout << "6 - Add to Cart" << endl ;
+                        cout << "7 - Show Cart Products" << endl ;
+                        cout << "8 - Remove from Cart" << endl ;
+                        cout << "9 - Edit Number of Product in Cart " << endl ;
+                        cout << "10 - Search in The Cart" << endl ;
+                        cout << "11 - Payment" << endl ;
+                        cout << "12 - History of Orders and Invoices" << endl ;
+                        cout << "13 - Increase Credit" << endl ;
+                        cout << "0 - Exit" << endl ;
+                        cout << endl ;
+                        cout << "Enter command number : " ;
+                        cin >> c ;
+                        isintc ;
+                        cout << endl ;
+                        switch (c) {
+                        case 0 : {
+                            end = 1 ;
+                            break;
+                        }
+                        case 1 : {
+                            system ("cls") ;
+                            yelow ;
+                            cout << "Username : " << t->Username << endl ;
+                            cout << "USD Wallet : " << t->DWallet << endl ;
+                            cout << "EUR Wallet : " << t->EWallet << endl ;
+                            cout << "IRR Wallet : " << t->RWallet << endl ;
+                            break ;
+                        }
+                        case 2 : {
+                            system ("cls") ;
+                            u.change_password(t) ;
+                            break ;
+                        }
+                        case 3 : {
+                            system ("cls") ;
+                            u.delete_account() ;
+                            end = 1 ;
+                            break ;
+                        }
+                        case 4 : {
+                            system ("cls") ;
+                            p.print(money) ;
+                            break ;
+                        }
+                        case 5 : {
+                            system ("cls") ;
+                            p.search_name(money) ;
+                            break ;
+                        }
+                        case 6 : {
+                            system ("cls") ;
+                            t->add_product_id(p) ;
+                            break ;
+                        }
+                        case 7 : {
+                            system ("cls") ;
+                            t->Cart.print(money) ;
+                            break ;
+                        }
+                        case 8 : {
+                            system ("cls") ;
+                            t->Cart.print(money) ;
+                            cout << endl ;
+                            t->Cart.remove_product() ;
+                            break ;
+                        }
+                        case 9 : {
+                            system ("cls") ;
+                            t->Cart.print(money) ;
+                            cout << endl ;
+                            t->edit_cart() ;
+                            break ;
+                        }
+                        case 10 : {
+                            system ("cls") ;
+                            t->Cart.search_name(money) ;
+                            break ;
+                        }
+                        case 11 : {
+                            system ("cls") ;
+                            t->payment(money,p,(*q)) ;
+                            break ;
+                        }
+                        case 12 : {
+                            system ("cls") ;
+                            t->Orders.i_print() ;
+                            break ;
+                        }
+                        case 13 : {
+                            system ("cls") ;
+                            t->increase_credit() ;
+                            break ;
+                        }
+                        default: {
+                            red ;
+                            cout << "Command not found !" << endl ;
+                        }
+                        }
+                        if ( end == 1 )
+                            break;
+                    }
+                }
+                //admin ----------------------------------------------------
+                else {
+                    while (true) {
+                        int c ; // command number
+                        blue ;
+                        cout << endl << endl << endl ;
+                        cout << "Commands :" << endl << endl ;
+                        cout << "1 - Add Product" << endl ;
+                        cout << "2 - Remove Product" << endl ;
+                        cout << "3 - Edit Product" << endl ;
+                        cout << "4 - Search Product" << endl ;
+                        cout << "5 - Show All Product" << endl ;
+                        cout << "6 - Show Users Profile" << endl ;
+                        cout << "7 - Set the Money Value" << endl ;
+                        cout << "8 - Invoice of Products Sold" << endl ;
+                        cout << "0 - Exit" << endl ;
+                        cout << endl ;
+                        cout << "Enter command number : " ;
+                        cin >> c ;
+                        isintc ;
+                        cout << endl ;
+                        switch (c) {
+                        case 0 : {
+                            end = 1 ;
+                            break;
+                        }
+                        case 1 : {
+                            system ("cls") ;
+                            p.add_product() ;
+                            break ;
+                        }
+                        case 2 : {
+                            system ("cls") ;
+                            p.remove_product() ;
+                            break ;
+                        }
+                        case 3 : {
+                            system ("cls") ;
+                            p.edit_product() ;
+                            break ;
+                        }
+                        case 4 : {
+                            system ("cls") ;
+                            p.search_name(money) ;
+                            break ;
+                        }
+                        case 5 : {
+                            system("cls") ;
+                            p.print(money) ;
+                            break ;
+                        }
+                        case 6 : {
+                            system ("cls") ;
+                            u.u_print() ;
+                            break ;
+                        }
+                        case 7 : {
+                            system ("cls") ;
+                            money.update_price() ;
+                            break ;
+                        }
+                        case 8 : {
+                            system ("cls") ;
+                            q->Orders.i_print() ;
+                            q->Orders.total_incom() ;
+                            break ;
+                        }
+                        default: {
+                            red ;
+                            cout << "Command not found !" << endl ;
+                        }
+                        }
+                        if ( end == 1 )
+                            break;
+                    }
+                }
+            }
+            break;
+        }
+        default: {
+            red ;
+            cout << "Command not found !" << endl ;
+        }
+        }
+        if ( end == 1 )
+            break;
+    }
+    u.uvec_save() ;
+    p.pset_save() ;
     return 0;
 }
