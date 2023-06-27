@@ -4,6 +4,7 @@
 #include <set>
 #include <vector>
 #include <ctime>
+#include <fstream>
 
 
 #define green if (1){HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE) ;SetConsoleTextAttribute(hConsole,10);}
@@ -66,6 +67,31 @@ public:
         e = d*(this->EUR) ;
         return e ;
     }
+
+    MoneyValue () {
+        ifstream m ("moneyvalue.txt") ;
+        if (m.is_open()) {
+            if (m.peek()  == ifstream::traits_type::eof() ) {
+                return;
+            }
+            else {
+                m >> IRR ;
+                m >> EUR ;
+                m.close() ;
+            }
+        }
+    }
+
+    ~MoneyValue () {
+        ofstream m ("moneyvalue.txt" , ios::trunc) ;
+        if (m.is_open()) {
+            m << IRR << endl ;
+            m << EUR << endl ;
+            m.close() ;
+        }
+    }
+
+
 };
 //-----------------------------------------------------------------------
 class product {
@@ -221,6 +247,39 @@ public:
             sum += i.Price*i.Number ;
         return sum ;
     }
+
+    void pset_read () {
+        ifstream p ("pset.txt") ;
+        if (p.is_open()) {
+            if (p.peek()  == ifstream::traits_type::eof() ) {
+                return;
+            }
+            else {
+                while (! p.eof()) {
+                    product t ;
+                    p >> t.ID ;
+                    p >> t.Name ;
+                    p >> t.Number ;
+                    p >> t.Price ;
+                    this->insert(t) ;
+                }
+            }
+            p.close() ;
+        }
+    }
+
+    void pset_save () {
+        ofstream p ("pset.txt" , ios::trunc) ;
+        if (p.is_open()) {
+            for ( const auto &i : (*this)) {
+                p << endl << i.ID << endl ;
+                p << i.Name << endl ;
+                p << i.Number << endl ;
+                p << i.Price  ;
+            }
+            p.close() ;
+        }
+    }
 };
 //------------------------------------------------------------------------
 class invoice {
@@ -241,6 +300,31 @@ public:
         DPayment_amount = Dpay_amount ;
         EPayment_amount = Epay_amount ;
         RPayment_amount = Rpay_amount ;
+    }
+    invoice () {};
+    void print_csv () {
+        ofstream f ("invoice.csv" , ios::app) ;
+        if (f.is_open()) {
+            f << "Sales Pro," ;
+            f << Username_of_buyer << "," ;
+            f << local_time->tm_mday << "/"
+              << local_time->tm_mon+1 << "/" << local_time->tm_year+1900 << "," ;
+            f << local_time->tm_hour << ":" << local_time->tm_min << "," ;
+            f << DPayment_amount << "," ;
+            f << EPayment_amount << "," ;
+            f << RPayment_amount << "," ;
+            for (pset::iterator i = O.begin() ; i != O.end() ; i ++ ) {
+                f << i->ID << "/" ;
+                f << i->Name << "/" ;
+                f << i->Number << "/" ;
+                f << i->Price ;
+                f << "," ;
+                f << endl ;
+                f << ",,,,,,," ;
+            }
+            f << endl ;
+            f.close() ;
+        }
     }
 };
 //------------------------------------------------------------------------
@@ -310,6 +394,15 @@ public:
         Cart.clear() ;
         Orders.clear() ;
     }
+
+    user () {
+        DWallet = 0 ;
+        EWallet = 0 ;
+        RWallet = 0 ;
+        Cart.clear() ;
+        Orders.clear() ;
+    }
+
     // add product by search ID (for users)
     void add_product_id (pset &p) {
         yelow ;
@@ -643,6 +736,100 @@ public:
                     j ++ ;
                 }
             }
+        }
+    }
+
+    void uvec_save () {
+        ofstream u ("uvec.txt" , ios::trunc) ;
+        if (u.is_open()) {
+            for ( const auto &i : (*this)) {
+                u << endl << i.Username << endl ;
+                u << i.Password << endl ;
+                u << i.DWallet << endl ;
+                u << i.EWallet << endl ;
+                u << i.RWallet << endl ;
+                u << i.Cart.size() ;
+                for ( const auto &j : i.Cart ){
+                    u << endl << j.ID << endl ;
+                    u << j.Name << endl ;
+                    u << j.Number << endl ;
+                    u << j.Price ;
+                }
+                u << endl << i.Orders.size() ;
+                for ( const auto &j : i.Orders ){
+                    u << endl << j.Username_of_buyer << endl ;
+                    u << j.now << endl ;
+                    u << j.DPayment_amount << endl ;
+                    u << j.EPayment_amount << endl ;
+                    u << j.RPayment_amount << endl ;
+                    u << j.O.size() ;
+                    for (const auto &k : j.O) {
+                        u << endl << k.ID << endl ;
+                        u << k.Name << endl ;
+                        u << k.Number << endl ;
+                        u << k.Price ;
+                    }
+                }
+            }
+            u.close() ;
+        }
+    }
+
+    void uvec_read () {
+        ifstream u ("uvec.txt") ;
+        if (u.is_open()) {
+            if (u.peek()  == ifstream::traits_type::eof() ) {
+                return;
+            }
+            else {
+                while (u.peek() != EOF ) {
+                    user t ;
+                    int c ; // count Cart
+                    u >> t.Username ;
+                    u >> t.Password ;
+                    u >> t.DWallet ;
+                    u >> t.EWallet ;
+                    u >> t.RWallet ;
+                    u >> c ;
+                    if (c == 0) {
+                        t.Cart.clear() ;
+                    }
+                    for (int i = 0 ; i < c ; i++ ) {
+                        product a ;
+                        u >> a.ID ;
+                        u >> a.Name ;
+                        u >> a.Number ;
+                        u >> a.Price ;
+                        t.Cart.insert(a) ;
+                    }
+                    int g ; //count Orders
+                    u >> g ;
+                    if (g == 0) {
+                        t.Orders.clear() ;
+                    }
+                    for (int i = 0 ; i < g ; i++ ) {
+                        invoice w ;
+                        u >> w.Username_of_buyer ;
+                        u >> w.now ;
+                        u >> w.DPayment_amount ;
+                        u >> w.EPayment_amount ;
+                        u >> w.RPayment_amount ;
+                        int h ; // count w.O
+                        u >> h ;
+                        for (int j = 0 ; j < h ; j++ ) {
+                            product s ;
+                            u >> s.ID ;
+                            u >> s.Name ;
+                            u >> s.Number ;
+                            u >> s.Price ;
+                            w.O.insert(s) ;
+                        }
+                        t.Orders.push_back(w) ;
+                    }
+                    this->push_back(t) ;
+                }
+            }
+            u.close() ;
         }
     }
 
